@@ -22,7 +22,6 @@ openssl x509 -noout -in cert.pem -enddate
 import argparse
 import datetime
 import os
-import random
 import subprocess
 import textwrap
 
@@ -38,10 +37,9 @@ def init_tls(domain):
     if success != 0:
         exit('Unable to clone letsencrypt. Nothing has been done yet. Aborting.')
     os.chdir(encr_dir)
-    rand = random.randrange(100000, 1000000)
-    os.makedirs('/home/public/.well-known/acme-challenge/{}/'.format(rand))
+    os.makedirs('/home/public/.well-known/acme-challenge/')
     with open('config.sh', 'w') as f:
-        f.write('WELLKNOWN="/home/public/.well-known/acme-challenge/{}/"\n'.format(rand))
+        f.write('WELLKNOWN="/home/public/.well-known/acme-challenge/"\n')
     with open('domains.txt', 'w') as f:
         f.write('{domain} www.{domain}\n'.format(domain=domain))
     print('\n\n\nINFO:\nTLS has been initialized.\n')
