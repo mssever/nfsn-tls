@@ -5,7 +5,7 @@ Automatically enable and/or update TLS on NearlyFreeSpeech.net sites using Let's
 
 ### Synopsis
 
-    run.py (--install | --update) [-fqh] DOMAIN
+    tls (--install | --update) [-fqh] DOMAIN
 
 ### Positional argument
 
