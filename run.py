@@ -22,6 +22,7 @@ openssl x509 -noout -in cert.pem -enddate
 import argparse
 import datetime
 import os
+import random
 import subprocess
 
 our_dir = os.path.dirname(os.path.realpath(__file__))
