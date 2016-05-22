@@ -61,7 +61,7 @@ def update_tls(domain):
         '''.format(os.path.realpath(os.curdir)))
     with open(os.path.join(our_dir, 'certificate_expiration.txt'), 'w') as f:
         f.write(str(cert_expires('cert', domain).timestamp()))
-    print('\n\n\nINFO:\nTLS has been updated.\n')
+    print('\n\n\nINFO:\nTLS has been updated. The new certificate expires on {}.\n'.format(cert_expires('file').isoformat()))
 
 def cert_expires(from_, domain=None):
     if from_ == 'cert':
