@@ -29,5 +29,5 @@ Required_Argument | Description
 Optional_Argument | Description
 -------- | -----------
 `-f`, `--force` | With `--update`, force certificate update even if it is not necessary
-`-q`, `--quiet` | With `--update`, exit silently if no update is carried out. Useful to avoid useless messages from cron.
+`-q`, `--quiet` | With `--update`, exit silently if no update is carried out. Useful to avoid useless messages from `cron`.
 `-h`, `--help` | Show this help message and exit
