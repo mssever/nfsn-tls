@@ -85,6 +85,25 @@ def cert_expires(from_, domain=None):
 def is_installed():
     return os.path.isdir(encr_dir)
 
+def print_next_steps(domain):
+    print('''\n============================================================================
+    Now that Let's Encrypt is installed, we need to keep it up to date. That
+    means that we need to set up a cron job. Log in to your account on NFSN
+    (members.nearlyfreespeech.net) and navigate to your site information page.
+    Then go to the "Manage Scheduled Tasks" item on the sidebar and set up a new
+    task.
+
+    Use the following command and set it to run daily (or weekly). Run it as
+    your user. It will monitor your certificate's expiration date and update it
+    two weeks before it expires.
+
+        {command} --update --quiet {domain}
+
+    With the --quiet option as above, you will only be notified when the
+    certificate is updated. If you want to be notified every time the script
+    runs, remove the --quiet option.
+    '''.format(domain=domain, command=os.path.realpath(__file__)))
+
 def parse_args():
     desc="Automatically enable and/or update TLS on NearlyFreeSpeech.net sites using Let's Encrypt"
     parser = argparse.ArgumentParser(description=desc)
@@ -113,6 +132,7 @@ def main():
         else:
             init_tls(args.domain)
             update_tls(args.domain)
+            print_next_steps(args.domain)
     elif args.update:
         if not is_installed():
             exit("You have to install Let's Encrypt first using the --install option.")
