@@ -3,7 +3,6 @@
 import argparse
 import datetime
 import os
-import random
 import subprocess
 import textwrap
 
@@ -19,16 +18,19 @@ def init_tls(domain):
     if success != 0:
         exit('Unable to clone letsencrypt. Nothing has been done yet. Aborting.')
     os.chdir(encr_dir)
-    rand = random.randrange(100000, 1000000)
-    os.makedirs('/home/public/.well-known/acme-challenge/{}/'.format(rand))
+    os.makedirs('/home/public/.well-known/acme-challenge/')
     with open('config.sh', 'w') as f:
-        f.write('WELLKNOWN="/home/public/.well-known/acme-challenge/{}/"\n'.format(rand))
+        f.write('WELLKNOWN="/home/public/.well-known/acme-challenge/"\n')
     with open('domains.txt', 'w') as f:
         f.write('{domain} www.{domain}\n'.format(domain=domain))
     print('\n\n\nINFO:\nTLS has been initialized.\n')
 
-def update_tls(domain):
+def update_tls(domain, is_install=False):
     os.chdir(encr_dir)
+    if not is_install:
+        success = subprocess.call(['git', 'pull'])
+        if success != 0:
+            print("Unable to update to the most recent version of Let's Encrypt. Continuing, but without the latest code.")
     success = subprocess.call(['./letsencrypt.sh', '--cron'])
     if success != 0:
         exit('Unable to run letsencrypt.sh. TLS has not been updated. Aborting.')
@@ -109,14 +111,14 @@ def parse_args():
 
 def main():
     args = parse_args()
+    if args.domain.endswith('.nfshost.com'):
+        exit("This script doesn't work with domains ending with '.nfshost.com'. If your site has its own domain name, please use that. If not, you can't use this script.")
     if args.install:
-        if args.domain.endswith('.nfshost.com'):
-            exit("This script doesn't work with domains ending with '.nfshost.com'. If your site has its own domain name, please use that. If not, you can't use this script.")
         if is_installed():
             exit("Let's Encrypt is already installed. Perhaps you meant to give --update instead of --install.")
         else:
             init_tls(args.domain)
-            update_tls(args.domain)
+            update_tls(args.domain, is_install=True)
             print_next_steps(args.domain)
     elif args.update:
         if not is_installed():
