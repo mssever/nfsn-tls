@@ -132,6 +132,10 @@ def main():
                 update_tls(domain)
             elif not args.quiet:
                 print("The certificate doesn't expire until {}. Not updating.".format(expires.isoformat()))
+        if not args.quiet:
+            print("Updating the nfsn-tls repository to the latest version. The new code, if any, will be used for the next update.")
+        os.chdir(our_dir)
+        subprocess.call(['git', 'pull'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 if __name__ == '__main__':
     main()
