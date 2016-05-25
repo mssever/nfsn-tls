@@ -125,7 +125,7 @@ def main():
             exit("You have to install Let's Encrypt first using the --install option.")
         now = datetime.datetime.now(datetime.timezone.utc)
         expires = cert_expires('file')
-        if expires - now <= datetime.datetime.timedelta(weeks=2):
+        if expires - now <= datetime.timedelta(weeks=2):
             update_tls(args.domain)
         else:
             if args.force:
