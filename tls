@@ -89,7 +89,7 @@ def print_next_steps(domain):
     | certificate is updated. If you want to be notified every time the script |
     | runs, remove the --quiet option.                                         |
     ============================================================================
-    '''.format(domain=domain, command=os.path.realpath(__file__))))
+    '''.format(domain=domain, command=os.path.join(our_dir, 'tls'))))
 
 def parse_args():
     desc="Automatically enable and/or update TLS on NearlyFreeSpeech.net sites using Let's Encrypt"
