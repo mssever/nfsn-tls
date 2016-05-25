@@ -19,7 +19,7 @@ def init_tls(domain):
         exit('Unable to clone letsencrypt. Nothing has been done yet. Aborting.')
     os.chdir(encr_dir)
     os.makedirs('/home/public/.well-known/acme-challenge/')
-    with open('config.sh', 'w') as f:
+    with open('config', 'w') as f:
         f.write('WELLKNOWN="/home/public/.well-known/acme-challenge/"\n')
     with open('domains.txt', 'w') as f:
         f.write('{domain} www.{domain}\n'.format(domain=domain))
@@ -34,7 +34,7 @@ def update_tls(domain, is_install=False):
     success = subprocess.call(['./letsencrypt.sh', '--cron'])
     if success != 0:
         exit('Unable to run letsencrypt.sh. TLS has not been updated. Aborting.')
-    os.chdir(cert_dir.format(domain))
+    os.chdir(cert_dir.format(domain=domain))
     success = subprocess.call(['bash', '-c', 'cat privkey.pem cert.pem chain.pem | nfsn -i set-tls'])
     if success != 0:
         exit('''Unable to import the certificates.
@@ -54,13 +54,13 @@ def cert_expires(from_, domain=None):
         try:
             raw = subprocess.check_output(
                 ['openssl', 'x509', '-noout', '-in',
-                    os.path.join(cert_dir.format(domain)), 'cert.pem', '-enddate'],
+                    os.path.join(cert_dir.format(domain=domain), 'cert.pem'), '-enddate'],
                 universal_newlines=True).strip()
         except subprocess.CalledProcessError:
             exit('Unable to determine the certificate expiration date. Please investigate. Aborting')
         # Example return from openssl: notAfter='Aug 20 00:24:00 2016 GMT'
         junk, when = raw.split('=', maxsplit=1)
-        return datetime.datetime.strptime(when.replace('GMT', '+0000'), '%b %d %H:%M:%S %Y %Z')
+        return datetime.datetime.strptime(when.replace('GMT', '+0000'), '%b %d %H:%M:%S %Y %z')
     elif from_ == 'file':
         with open(os.path.join(our_dir, 'certificate_expiration.txt')) as f:
             return datetime.datetime.fromtimestamp(float(f.read().strip()), tz=datetime.timezone.utc)
