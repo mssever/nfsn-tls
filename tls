@@ -2,6 +2,7 @@
 
 import argparse
 import datetime
+import json
 import os
 import subprocess
 import textwrap
@@ -12,7 +13,6 @@ encr_dir = os.path.join(priv_dir, 'letsencrypt.sh')
 cert_dir = os.path.join(encr_dir, 'certs', '{domain}')
 
 def init_tls(domain):
-    #print({'our': our_dir, 'priv': priv_dir, 'encr': encr_dir, 'cert': cert_dir.format(domain=domain)})
     os.chdir(priv_dir)
     success = subprocess.call(['git', 'clone', 'https://github.com/lukas2511/letsencrypt.sh'])
     if success != 0:
@@ -21,12 +21,27 @@ def init_tls(domain):
     os.makedirs('/home/public/.well-known/acme-challenge/')
     with open('config', 'w') as f:
         f.write('WELLKNOWN="/home/public/.well-known/acme-challenge/"\n')
-    with open('domains.txt', 'w') as f:
-        f.write('{domain} www.{domain}\n'.format(domain=domain))
+    list_aliases()
     print('\n\n\nINFO:\nTLS has been initialized.\n')
+
+def list_aliases():
+    aliases = json.loads(subprocess.getoutput('nfsn -j list-aliases'))
+    if len(aliases) == 0:
+        exit('You have no aliases for this site, which means that you cannot use this script. This script does not work with *.nfshost.com domains.')
+    return aliases
+
+def get_cert_dir():
+    dirs = [cert_dir.format(domain=a) for a in list_aliases()]
+    for dir_ in dirs:
+        if os.path.isdir(dir_):
+            return dir_
+    raise RuntimeError('Unable to automatically locate the certificate directory.')
 
 def update_tls(domain, is_install=False):
     os.chdir(encr_dir)
+    else:
+        with open('domains.txt', 'w') as f:
+            f.write(' '.join(list_aliases()))
     if not is_install:
         success = subprocess.call(['git', 'pull'])
         if success != 0:
@@ -34,11 +49,12 @@ def update_tls(domain, is_install=False):
     success = subprocess.call(['./letsencrypt.sh', '--cron'])
     if success != 0:
         exit('Unable to run letsencrypt.sh. TLS has not been updated. Aborting.')
-    os.chdir(cert_dir.format(domain=domain))
+    
+    os.chdir(get_cert_dir())
     success = subprocess.call(['bash', '-c', 'cat privkey.pem cert.pem chain.pem | nfsn -i set-tls'])
     if success != 0:
         exit('''Unable to import the certificates.
-        After investing the problem, please run these commands:
+        After investigating the problem, please run these commands:
 
         cd {}
         cat privkey.pem cert.pem chain.pem | nfsn -i set-tls
@@ -54,7 +70,7 @@ def cert_expires(from_, domain=None):
         try:
             raw = subprocess.check_output(
                 ['openssl', 'x509', '-noout', '-in',
-                    os.path.join(cert_dir.format(domain=domain), 'cert.pem'), '-enddate'],
+                    os.path.join(get_cert_dir(), 'cert.pem'), '-enddate'],
                 universal_newlines=True).strip()
         except subprocess.CalledProcessError:
             exit('Unable to determine the certificate expiration date. Please investigate. Aborting')
@@ -98,7 +114,7 @@ def parse_args():
     padd = parser.add_argument
     gadd = group.add_argument
     padd('domain', metavar='DOMAIN',
-        help='Your bare domain name (example.com, not www.example.com). IMPORTANT NOTE: This script DOES NOT work with NFSN default names, such as example.nfshost.com.')
+        help='Your primary domain name; your other aliases will be detected automatically. IMPORTANT NOTE: This script DOES NOT work with NFSN default names, such as example.nfshost.com.')
     gadd('--install', action='store_true',
         help="Enable Let's Encrypt for the first time")
     gadd('--update', action='store_true',
