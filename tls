@@ -39,9 +39,8 @@ def get_cert_dir():
 
 def update_tls(domain, is_install=False):
     os.chdir(encr_dir)
-    else:
-        with open('domains.txt', 'w') as f:
-            f.write(' '.join(list_aliases()))
+    with open('domains.txt', 'w') as f:
+        f.write(' '.join(list_aliases()))
     if not is_install:
         success = subprocess.call(['git', 'pull'])
         if success != 0:
