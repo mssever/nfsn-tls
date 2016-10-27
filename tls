@@ -160,7 +160,7 @@ def main():
             update_tls(args.domain)
         else:
             if args.force:
-                update_tls(domain)
+                update_tls(args.domain)
             elif not args.quiet:
                 print("The certificate doesn't expire until {}. Not updating.".format(expires.isoformat()))
         if not args.quiet:
