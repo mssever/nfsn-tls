@@ -19,14 +19,14 @@ Argument | Description
 
 One (and only one) of the following arguments is required:
 
-Required Argument | Description
+Required_Argument | Description
 -------- | -----------
 `--install` | Enable Let's Encrypt for the first time
 `--update` | Update your certificate, if necessary. Will not update certificates which are valid for at least two more weeks unless `-f`/`--force` is given.
 
 ### Optional arguments
 
-Optional Argument | Description
+Optional_Argument | Description
 -------- | -----------
 `-f`, `--force` | With `--update`, force certificate update even if it is not necessary
 `-q`, `--quiet` | With `--update`, exit silently if no update is carried out. Useful to avoid useless messages from `cron`.
