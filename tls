@@ -9,14 +9,14 @@ import textwrap
 
 our_dir = os.path.dirname(os.path.realpath(__file__))
 priv_dir = '/home/private'
-encr_dir = os.path.join(priv_dir, 'letsencrypt.sh')
+encr_dir = os.path.join(priv_dir, 'dehydrated')
 cert_dir = os.path.join(encr_dir, 'certs', '{domain}')
 
 def init_tls(domain):
     os.chdir(priv_dir)
-    success = subprocess.call(['git', 'clone', 'https://github.com/lukas2511/letsencrypt.sh'])
+    success = subprocess.call(['git', 'clone', 'https://github.com/lukas2511/dehydrated.git'])
     if success != 0:
-        exit('Unable to clone letsencrypt. Nothing has been done yet. Aborting.')
+        exit('Unable to clone dehydrated. Nothing has been done yet. Aborting.')
     os.chdir(encr_dir)
     os.makedirs('/home/public/.well-known/acme-challenge/')
     with open('config', 'w') as f:
@@ -45,9 +45,9 @@ def update_tls(domain, is_install=False):
         success = subprocess.call(['git', 'pull'])
         if success != 0:
             print("Unable to update to the most recent version of Let's Encrypt. Continuing, but without the latest code.")
-    success = subprocess.call(['./letsencrypt.sh', '--cron'])
+    success = subprocess.call(['./dehydrated', '--cron'])
     if success != 0:
-        exit('Unable to run letsencrypt.sh. TLS has not been updated. Aborting.')
+        exit('Unable to run dehydrated. TLS has not been updated. Aborting.')
     
     os.chdir(get_cert_dir())
     success = subprocess.call(['bash', '-c', 'cat privkey.pem cert.pem chain.pem | nfsn -i set-tls'])
