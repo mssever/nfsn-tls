@@ -51,7 +51,7 @@ def update_tls(domain, is_install=False):
         exit('Unable to run dehydrated. TLS has not been updated. Aborting.')
     
     os.chdir(get_cert_dir())
-    success = subprocess.call(['bash', '-c', 'cat privkey.pem cert.pem chain.pem | nfsn -i set-tls'])
+    success = subprocess.call('cat privkey.pem cert.pem chain.pem | nfsn -i set-tls', shell=True)
     if success != 0:
         exit('''Unable to import the certificates.
         After investigating the problem, please run these commands:
