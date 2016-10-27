@@ -7,6 +7,7 @@ import os
 import subprocess
 import textwrap
 
+VERSION = '1.1'
 our_dir = os.path.dirname(os.path.realpath(__file__))
 priv_dir = '/home/private'
 encr_dir = os.path.join(priv_dir, 'dehydrated')
@@ -83,7 +84,22 @@ def cert_expires(from_, domain=None):
         raise ValueError('Bad value for from_')
 
 def is_installed():
-    return os.path.isdir(encr_dir)
+    if os.path.isdir(encr_dir):
+        return True
+    elif os.path.isdir(os.path.join(priv_dir, 'letsencrypt.sh')):
+        upgrade(VERSION)
+        return True
+    else:
+        return False
+
+def upgrade(target_version):
+    if target_version == '1.1':
+        os.rename(os.path.join(priv_dir, 'letsencrypt.sh'), encr_dir)
+    # elif target_version == '1.2':
+    #     upgrade('1.1')
+    #     do_version_1_2_upgrade()
+    else:
+        raise NotImplementedError('Upgrading to version {} is not supported'.format(target_version))
 
 def print_next_steps(domain):
     print(textwrap.dedent('''\n
