@@ -46,7 +46,7 @@ def update_tls(domain, is_install=False):
         success = subprocess.call(['git', 'pull'])
         if success != 0:
             print("Unable to update to the most recent version of Let's Encrypt. Continuing, but without the latest code.")
-    success = subprocess.call(['./dehydrated', '--cron'])
+    success = subprocess.call(['./dehydrated', '--cron', '--domain', domain])
     if success != 0:
         exit('Unable to run dehydrated. TLS has not been updated. Aborting.')
     
